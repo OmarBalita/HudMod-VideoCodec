@@ -1,0 +1,16 @@
+[configuration]
+
+entry_symbol = "library_init"
+compatibility_minimum = "4.6"
+reloadable = true
+
+[libraries]
+
+windows.debug.x86_64 = "res://addons/ffmpeg_codec/win64/VideoCodec.windows.template_debug.x86_64.dll"
+
+windows.release.x86_64 = "res://addons/ffmpeg_codec/win64/VideoCodec.windows.template_release.x86_64.dll"
+windows.release.x86_32 = "res://addons/ffmpeg_codec/win32/VideoCodec.windows.template_release.x86_32.dll"
+windows.release.arm64 = "res://addons/ffmpeg_codec/winarm64/VideoCodec.windows.template_release.arm64.dll"
+
+linux.release.x86_64 = "res://addons/ffmpeg_codec/linux64/VideoCodec.linux.template_release.x86_64.so"
+linux.release.arm64 = "res://addons/ffmpeg_codec/linuxarm64/VideoCodec.linux.template_release.arm64.so"
