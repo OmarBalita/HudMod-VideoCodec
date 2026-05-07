@@ -1,2 +1,5 @@
-/ffmpeg
-/godot-cpp
+/third_party/ffmpeg/bin
+/.vscode
+/.cache
+/build
+/.sconsign.dblite
