@@ -2,4 +2,4 @@
 /.cache
 /build
 /.sconsign.dblite
-/third_party/ffmpeg/lib
+/thirdparty/ffmpeg/lib
