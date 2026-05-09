@@ -1,5 +1,5 @@
-/third_party/ffmpeg/bin
 /.vscode
 /.cache
 /build
 /.sconsign.dblite
+/third_party/ffmpeg/lib

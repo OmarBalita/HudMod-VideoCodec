@@ -133,6 +133,10 @@ Select full chroma input.
 .IP \fBbitexact\fR 4
 .IX Item "bitexact"
 Enable bitexact output.
+.IP \fBunstable\fR 4
+.IX Item "unstable"
+Allow the use of experimental new code. May subtly affect the output or even
+produce wrong results. For testing only.
 .RE
 .RS 4
 .RE
@@ -162,6 +166,9 @@ If value is set to \f(CW1\fR, indicates source is full range. Default value is
 .IX Item "dst_range (boolean)"
 If value is set to \f(CW1\fR, enable full range for destination. Default value
 is \f(CW0\fR, which enables limited range.
+.IP "\fBgamma\fR \fI(boolean)\fR" 4
+.IX Item "gamma (boolean)"
+If value is set to \f(CW1\fR, enable gamma correct scaling. Default value is \f(CW0\fR.
 .IP "\fBparam0, param1\fR" 4
 .IX Item "param0, param1"
 Set scaling algorithm parameters. The specified values are specific of

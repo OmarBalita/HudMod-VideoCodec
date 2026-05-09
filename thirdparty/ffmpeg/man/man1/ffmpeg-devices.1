@@ -293,40 +293,6 @@ Record raw DV data from a suitable input device and write the output into out.dv
 .Vb 1
 \&        $ ffmpeg \-f avfoundation \-capture_raw_data true \-i "zr100:none" out.dv
 .Ve
-.SS bktr
-.IX Subsection "bktr"
-BSD video input device. Deprecated and will be removed \- please contact
-the developers if you are interested in maintaining it.
-.PP
-\fIOptions\fR
-.IX Subsection "Options"
-.IP \fBframerate\fR 4
-.IX Item "framerate"
-Set the frame rate.
-.IP \fBvideo_size\fR 4
-.IX Item "video_size"
-Set the video frame size. Default is \f(CW\*(C`vga\*(C'\fR.
-.IP \fBstandard\fR 4
-.IX Item "standard"
-Available values are:
-.RS 4
-.IP \fBpal\fR 4
-.IX Item "pal"
-.PD 0
-.IP \fBntsc\fR 4
-.IX Item "ntsc"
-.IP \fBsecam\fR 4
-.IX Item "secam"
-.IP \fBpaln\fR 4
-.IX Item "paln"
-.IP \fBpalm\fR 4
-.IX Item "palm"
-.IP \fBntscj\fR 4
-.IX Item "ntscj"
-.RE
-.RS 4
-.RE
-.PD
 .SS decklink
 .IX Subsection "decklink"
 The decklink input device provides capture capabilities for Blackmagic
@@ -795,7 +761,7 @@ Win32 GDI-based screen capture device.
 .PP
 This device allows you to capture a region of the display on Windows.
 .PP
-Amongst options for the imput filenames are such elements as:
+Amongst options for the input filenames are such elements as:
 .PP
 .Vb 1
 \&        desktop
@@ -1966,49 +1932,6 @@ Required pixel format depends on current framebuffer settings.
 .Ve
 .PP
 See also <\fBhttp://linux\-fbdev.sourceforge.net/\fR>, and \fBfbset\fR\|(1).
-.SS opengl
-.IX Subsection "opengl"
-OpenGL output device. Deprecated and will be removed.
-.PP
-To enable this output device you need to configure FFmpeg with \f(CW\*(C`\-\-enable\-opengl\*(C'\fR.
-.PP
-This output device allows one to render to OpenGL context.
-Context may be provided by application or default SDL window is created.
-.PP
-When device renders to external context, application must implement handlers for following messages:
-\&\f(CW\*(C`AV_DEV_TO_APP_CREATE_WINDOW_BUFFER\*(C'\fR \- create OpenGL context on current thread.
-\&\f(CW\*(C`AV_DEV_TO_APP_PREPARE_WINDOW_BUFFER\*(C'\fR \- make OpenGL context current.
-\&\f(CW\*(C`AV_DEV_TO_APP_DISPLAY_WINDOW_BUFFER\*(C'\fR \- swap buffers.
-\&\f(CW\*(C`AV_DEV_TO_APP_DESTROY_WINDOW_BUFFER\*(C'\fR \- destroy OpenGL context.
-Application is also required to inform a device about current resolution by sending \f(CW\*(C`AV_APP_TO_DEV_WINDOW_SIZE\*(C'\fR message.
-.PP
-\fIOptions\fR
-.IX Subsection "Options"
-.IP \fBbackground\fR 4
-.IX Item "background"
-Set background color. Black is a default.
-.IP \fBno_window\fR 4
-.IX Item "no_window"
-Disables default SDL window when set to non-zero value.
-Application must provide OpenGL context and both \f(CW\*(C`window_size_cb\*(C'\fR and \f(CW\*(C`window_swap_buffers_cb\*(C'\fR callbacks when set.
-.IP \fBwindow_title\fR 4
-.IX Item "window_title"
-Set the SDL window title, if not specified default to the filename specified for the output device.
-Ignored when \fBno_window\fR is set.
-.IP \fBwindow_size\fR 4
-.IX Item "window_size"
-Set preferred window size, can be a string of the form widthxheight or a video size abbreviation.
-If not specified it defaults to the size of the input video, downscaled according to the aspect ratio.
-Mostly usable when \fBno_window\fR is not set.
-.PP
-\fIExamples\fR
-.IX Subsection "Examples"
-.PP
-Play a file on SDL window using OpenGL rendering:
-.PP
-.Vb 1
-\&        ffmpeg  \-i INPUT \-f opengl "window title"
-.Ve
 .SS oss
 .IX Subsection "oss"
 OSS (Open Sound System) output device.
@@ -2076,79 +1999,6 @@ Play a file on default device on default server:
 .PP
 .Vb 1
 \&        ffmpeg  \-i INPUT \-f pulse "stream name"
-.Ve
-.SS sdl
-.IX Subsection "sdl"
-SDL (Simple DirectMedia Layer) output device. Deprecated and will be removed.
-.PP
-For monitoring purposes in FFmpeg, pipes and a video player such as ffplay can be used:
-.PP
-.Vb 1
-\&        ffmpeg \-i INPUT \-f nut \-c:v rawvideo \- | ffplay \-
-.Ve
-.PP
-"sdl2" can be used as alias for "sdl".
-.PP
-This output device allows one to show a video stream in an SDL
-window. Only one SDL window is allowed per application, so you can
-have only one instance of this output device in an application.
-.PP
-To enable this output device you need libsdl installed on your system
-when configuring your build.
-.PP
-For more information about SDL, check:
-<\fBhttp://www.libsdl.org/\fR>
-.PP
-\fIOptions\fR
-.IX Subsection "Options"
-.IP \fBwindow_borderless\fR 4
-.IX Item "window_borderless"
-Set SDL window border off.
-Default value is 0 (enable window border).
-.IP \fBwindow_enable_quit\fR 4
-.IX Item "window_enable_quit"
-Enable quit action (using window button or keyboard key)
-when non-zero value is provided.
-Default value is 1 (enable quit action).
-.IP \fBwindow_fullscreen\fR 4
-.IX Item "window_fullscreen"
-Set fullscreen mode when non-zero value is provided.
-Default value is zero.
-.IP \fBwindow_size\fR 4
-.IX Item "window_size"
-Set the SDL window size, can be a string of the form
-\&\fIwidth\fRx\fIheight\fR or a video size abbreviation.
-If not specified it defaults to the size of the input video,
-downscaled according to the aspect ratio.
-.IP \fBwindow_title\fR 4
-.IX Item "window_title"
-Set the SDL window title, if not specified default to the filename
-specified for the output device.
-.IP \fBwindow_x\fR 4
-.IX Item "window_x"
-.PD 0
-.IP \fBwindow_y\fR 4
-.IX Item "window_y"
-.PD
-Set the position of the window on the screen.
-.PP
-\fIInteractive commands\fR
-.IX Subsection "Interactive commands"
-.PP
-The window created by the device can be controlled through the
-following interactive commands.
-.IP "\fBq, ESC\fR" 4
-.IX Item "q, ESC"
-Quit the device immediately.
-.PP
-\fIExamples\fR
-.IX Subsection "Examples"
-.PP
-The following command shows the \fBffmpeg\fR output is an
-SDL window, forcing its size to the qcif format:
-.PP
-.Vb 1
-\&        ffmpeg \-i INPUT \-c:v rawvideo \-pix_fmt yuv420p \-window_size qcif \-f sdl "SDL output"
 .Ve
 .SS sndio
 .IX Subsection "sndio"

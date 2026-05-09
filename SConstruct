@@ -32,7 +32,7 @@ if target_platform in ["linux", "x11"] and target_arch == "arm64":
     env['RANLIB'] = 'aarch64-linux-gnu-ranlib'
     env.Append(CCFLAGS=['-march=armv8-a'])
 
-platform_map = {"windows": "win", "linux": "linux", "x11": "linux"}
+platform_map = {"windows": "windows", "linux": "linux", "x11": "linux"}
 arch_map      = {"x86_64": "x8664", "x86_32": "x8632", "arm64": "arm64"}
 
 p_prefix    = platform_map.get(target_platform, target_platform)
@@ -40,8 +40,15 @@ a_suffix    = arch_map.get(target_arch, target_arch)
 folder_name = "{}_{}".format(p_prefix, a_suffix)
 
 ffmpeg_base         = os.path.abspath("thirdparty/ffmpeg")
-ffmpeg_lib_path     = os.path.join(ffmpeg_base, "lib")
+ffmpeg_lib_path     = os.path.join(ffmpeg_base, "lib", folder_name)
 ffmpeg_include_path = os.path.join(ffmpeg_base, "include")
+
+if not os.path.isdir(ffmpeg_lib_path):
+    print("ERROR: FFmpeg lib folder not found: {}\n Available folders: {}".format(
+        ffmpeg_lib_path,
+        os.listdir(os.path.join(ffmpeg_base, "lib")) if os.path.isdir(os.path.join(ffmpeg_base, "lib")) else "lib/ directory missing",
+    ))
+    Exit(1)
 
 env.Append(CPPPATH=["src/", ffmpeg_include_path])
 env.Append(LIBPATH=[ffmpeg_lib_path])

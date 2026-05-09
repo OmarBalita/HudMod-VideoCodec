@@ -281,6 +281,72 @@ see page 44\-46 or section 5.5 of
 .SS eac3_core
 .IX Subsection "eac3_core"
 Extract the core from a E\-AC\-3 stream, dropping extra channels.
+.SS eia608_to_smpte436m
+.IX Subsection "eia608_to_smpte436m"
+Convert from a \f(CW\*(C`EIA_608\*(C'\fR stream to a \f(CW\*(C`SMPTE_436M_ANC\*(C'\fR data stream, wrapping the closed captions in CTA\-708 CDP VANC packets.
+.IP \fBline_number\fR 4
+.IX Item "line_number"
+Choose which line number the generated VANC packets should go on. You generally want either line 9 (the default) or 11.
+.IP \fBwrapping_type\fR 4
+.IX Item "wrapping_type"
+Choose the SMPTE 436M wrapping type, defaults to \fBvanc_frame\fR.
+It accepts the values:
+.RS 4
+.IP \fBvanc_frame\fR 4
+.IX Item "vanc_frame"
+VANC frame (interlaced or segmented progressive frame)
+.IP \fBvanc_field_1\fR 4
+.IX Item "vanc_field_1"
+.PD 0
+.IP \fBvanc_field_2\fR 4
+.IX Item "vanc_field_2"
+.IP \fBvanc_progressive_frame\fR 4
+.IX Item "vanc_progressive_frame"
+.RE
+.RS 4
+.RE
+.IP \fBsample_coding\fR 4
+.IX Item "sample_coding"
+.PD
+Choose the SMPTE 436M sample coding, defaults to \fB8bit_luma\fR.
+It accepts the values:
+.RS 4
+.IP \fB8bit_luma\fR 4
+.IX Item "8bit_luma"
+8\-bit component luma samples
+.IP \fB8bit_color_diff\fR 4
+.IX Item "8bit_color_diff"
+8\-bit component color difference samples
+.IP \fB8bit_luma_and_color_diff\fR 4
+.IX Item "8bit_luma_and_color_diff"
+8\-bit component luma and color difference samples
+.IP \fB10bit_luma\fR 4
+.IX Item "10bit_luma"
+10\-bit component luma samples
+.IP \fB10bit_color_diff\fR 4
+.IX Item "10bit_color_diff"
+10\-bit component color difference samples
+.IP \fB10bit_luma_and_color_diff\fR 4
+.IX Item "10bit_luma_and_color_diff"
+10\-bit component luma and color difference samples
+.IP \fB8bit_luma_parity_error\fR 4
+.IX Item "8bit_luma_parity_error"
+8\-bit component luma samples with parity error
+.IP \fB8bit_color_diff_parity_error\fR 4
+.IX Item "8bit_color_diff_parity_error"
+8\-bit component color difference samples with parity error
+.IP \fB8bit_luma_and_color_diff_parity_error\fR 4
+.IX Item "8bit_luma_and_color_diff_parity_error"
+8\-bit component luma and color difference samples with parity error
+.RE
+.RS 4
+.RE
+.IP \fBinitial_cdp_sequence_cntr\fR 4
+.IX Item "initial_cdp_sequence_cntr"
+The initial value of the CDP's 16\-bit unsigned integer \f(CW\*(C`cdp_hdr_sequence_cntr\*(C'\fR and \f(CW\*(C`cdp_ftr_sequence_cntr\*(C'\fR fields. Defaults to 0.
+.IP \fBcdp_frame_rate\fR 4
+.IX Item "cdp_frame_rate"
+Set the CDP's \f(CW\*(C`cdp_frame_rate\*(C'\fR field. This doesn't actually change the timing of the data stream, it just changes the values inserted in that field in the generated CDP packets. Defaults to \fB30000/1001\fR.
 .SS extract_extradata
 .IX Subsection "extract_extradata"
 Extract the in-band extradata.
@@ -544,9 +610,21 @@ Please note that this filter is auto-inserted for MPEG-TS (muxer
 \&\f(CW\*(C`mpegts\*(C'\fR) and raw H.264 (muxer \f(CW\*(C`h264\*(C'\fR) output formats.
 .SS h264_redundant_pps
 .IX Subsection "h264_redundant_pps"
-This applies a specific fixup to some Blu-ray streams which contain
-redundant PPSs modifying irrelevant parameters of the stream which
-confuse other transformations which require correct extradata.
+This applies a specific fixup to some Blu-ray BDMV H264 streams
+which contain redundant PPSs. The PPSs modify irrelevant parameters
+of the stream, confusing other transformations which require
+the correct extradata.
+.PP
+The encoder used on these impacted streams adds extra PPSs throughout
+the stream, varying the initial QP and whether weighted prediction
+was enabled. This causes issues after copying the stream into
+a global header container, as the starting PPS is not suitable
+for the rest of the stream. One side effect, for example,
+is seeking will return garbled output until a new PPS appears.
+.PP
+This BSF removes the extra PPSs and rewrites the slice headers
+such that the stream uses a single leading PPS in the global header,
+which resolves the issue.
 .SS hevc_metadata
 .IX Subsection "hevc_metadata"
 Modify metadata embedded in an HEVC stream.
@@ -850,13 +928,13 @@ Drop every video packet not marked as a keyframe after timestamp 30s but do not
 modify any of the remaining packets.
 .PP
 .Vb 1
-\&        ffmpeg \-i INPUT \-c copy \-bsf:v noise=drop=\*(Aqgt(t\e,30)*not(key)\*(Aq output.mkv
+\&        ffmpeg \-i INPUT \-c copy \-bsf:v noise=drop=\*(Aqgt(pts*tb\e,30)*not(key)\*(Aq output.mkv
 .Ve
 .PP
 Drop one second of audio every 10 seconds and add some random noise to the rest.
 .PP
 .Vb 1
-\&        ffmpeg \-i INPUT \-c copy \-bsf:a noise=amount=\-1:drop=\*(Aqbetween(mod(t\e,10)\e,9\e,10)\*(Aq output.mkv
+\&        ffmpeg \-i INPUT \-c copy \-bsf:a noise=amount=\-1:drop=\*(Aqbetween(mod(pts*tb\e,10)\e,9\e,10)\*(Aq output.mkv
 .Ve
 .SS null
 .IX Subsection "null"
@@ -1031,6 +1109,9 @@ Set expression for duration.
 .IP \fBtime_base\fR 4
 .IX Item "time_base"
 Set output time base.
+.IP \fBprescale\fR 4
+.IX Item "prescale"
+Set whether to convert time fields to user-set output time base before evaluation of expressions. Defaults to 0.
 .PP
 The expressions are evaluated through the eval API and can contain the following
 constants:
@@ -1089,7 +1170,7 @@ The next input PTS.
 The next input duration.
 .IP \fBTB\fR 4
 .IX Item "TB"
-The timebase of stream packet belongs.
+The timebase in which time fields are denominated. The user-set output timebase if prescale is enabled, else the input timebase.
 .IP \fBTB_OUT\fR 4
 .IX Item "TB_OUT"
 The output timebase.
@@ -1109,6 +1190,10 @@ For example, to set PTS equal to DTS (not recommended if B\-frames are involved)
 .IX Subsection "showinfo"
 Log basic packet information. Mainly useful for testing, debugging,
 and development.
+.SS smpte436m_to_eia608
+.IX Subsection "smpte436m_to_eia608"
+Convert from a \f(CW\*(C`SMPTE_436M_ANC\*(C'\fR data stream to a \f(CW\*(C`EIA_608\*(C'\fR stream,
+extracting the closed captions from CTA\-708 CDP VANC packets, and ignoring all other data.
 .SS text2movsub
 .IX Subsection "text2movsub"
 Convert text subtitles to MOV subtitles (as used by the \f(CW\*(C`mov_text\*(C'\fR

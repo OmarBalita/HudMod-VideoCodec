@@ -950,6 +950,9 @@ for codecs that support it. At present, those are H.264 and VP9.
 .IX Item "film_grain"
 Export film grain parameters through frame side data (see \f(CW\*(C`AV_FRAME_DATA_FILM_GRAIN_PARAMS\*(C'\fR).
 Supported at present by AV1 decoders.
+.IP \fBenhancements\fR 4
+.IX Item "enhancements"
+Export picture enhancement metadata through frame side data, e.g. LCEVC (see \f(CW\*(C`AV_FRAME_DATA_LCEVC\*(C'\fR).
 .RE
 .RS 4
 .RE
@@ -1312,6 +1315,19 @@ Possible values:
 .RE
 .RS 4
 .RE
+.IP "\fBalpha_mode\fR \fIinteger\fR \fB(\fR\fIdecoding/encoding,video\fR\fB)\fR" 4
+.IX Item "alpha_mode integer (decoding/encoding,video)"
+.PD
+Possible values:
+.RS 4
+.IP \fBpremultiplied\fR 4
+.IX Item "premultiplied"
+.PD 0
+.IP \fBstraight\fR 4
+.IX Item "straight"
+.RE
+.RS 4
+.RE
 .IP "\fBlog_level_offset\fR \fIinteger\fR" 4
 .IX Item "log_level_offset integer"
 .PD
@@ -1552,16 +1568,6 @@ You need to explicitly configure the build with \f(CW\*(C`\-\-enable\-libdav1d\*
 .IX Subsection "Options"
 .PP
 The following options are supported by the libdav1d wrapper.
-.IP \fBframethreads\fR 4
-.IX Item "framethreads"
-Set amount of frame threads to use during decoding. The default value is 0 (autodetect).
-This option is deprecated for libdav1d >= 1.0 and will be removed in the future. Use the
-option \f(CW\*(C`max_frame_delay\*(C'\fR and the global option \f(CW\*(C`threads\*(C'\fR instead.
-.IP \fBtilethreads\fR 4
-.IX Item "tilethreads"
-Set amount of tile threads to use during decoding. The default value is 0 (autodetect).
-This option is deprecated for libdav1d >= 1.0 and will be removed in the future. Use the
-global option \f(CW\*(C`threads\*(C'\fR instead.
 .IP \fBmax_frame_delay\fR 4
 .IX Item "max_frame_delay"
 Set max amount of frames the decoder may buffer internally. The default value is 0
@@ -1767,6 +1773,14 @@ The following option is supported by the libilbc wrapper.
 .IX Item "enhance"
 Enable the enhancement of the decoded audio when set to 1. The default
 value is 0 (disabled).
+.SS libmpeghdec
+.IX Subsection "libmpeghdec"
+libmpeghdec decoder wrapper.
+.PP
+libmpeghdec allows libmpeghdec to decode the MPEG-H 3D audio codec.
+Requires the presence of the libmpeghdec headers and library during
+configuration. You need to explicitly configure the build with
+\&\f(CW\*(C`\-\-enable\-libmpeghdec \-\-enable\-nonfree\*(C'\fR.
 .SS libopencore-amrnb
 .IX Subsection "libopencore-amrnb"
 libopencore-amrnb decoder wrapper.
@@ -1828,7 +1842,7 @@ Enabled by default.
 Yet another ARIB STD\-B24 caption decoder using external \fIlibaribcaption\fR
 library.
 .PP
-Implements profiles A and C of the Japanse ARIB STD\-B24 standard,
+Implements profiles A and C of the Japanese ARIB STD\-B24 standard,
 Brazilian ABNT NBR 15606\-1, and Philippines version of ISDB-T.
 .PP
 Requires the presence of the libaribcaption headers and library
@@ -1886,7 +1900,7 @@ Specify comma-separated list of font family names to be used for \fIbitmap\fR
 or \fIass\fR type subtitle rendering.
 Only first font name is used for \fIass\fR type subtitle.
 .Sp
-If not specified, use internaly defined default font family.
+If not specified, use internally defined default font family.
 .IP "\fB\-ass_single_rect\fR \fIboolean\fR" 4
 .IX Item "-ass_single_rect boolean"
 ARIB STD\-B24 specifies that some captions may be displayed at different
@@ -1904,7 +1918,7 @@ default behavior at compilation.
 .IP "\fB\-force_outline_text\fR \fIboolean\fR" 4
 .IX Item "-force_outline_text boolean"
 Specify whether always render outline text for all characters regardless of
-the indication by charactor style.
+the indication by character style.
 .Sp
 The default is \fIfalse\fR.
 .IP "\fB\-outline_width\fR \fInumber\fR \fB(0.0 \- 3.0)\fR" 4
@@ -2225,15 +2239,8 @@ debugging by setting the option to "disable".
 Enables the use of the long term prediction extension which increases coding
 efficiency in very low bandwidth situations such as encoding of voice or
 solo piano music by extending constant harmonic peaks in bands throughout
-frames. This option is implied by profile:a aac_low and is incompatible with
-aac_pred. Use in conjunction with \fB\-ar\fR to decrease the samplerate.
-.IP \fBaac_pred\fR 4
-.IX Item "aac_pred"
-Enables the use of a more traditional style of prediction where the spectral
-coefficients transmitted are replaced by the difference of the current
-coefficients minus the previous "predicted" coefficients. In theory and sometimes
-in practice this can improve quality for low to mid bitrate audio.
-This option implies the aac_main profile and is incompatible with aac_ltp.
+frames. This option is implied by profile:a aac_low.
+Use in conjunction with \fB\-ar\fR to decrease the samplerate.
 .IP \fBprofile\fR 4
 .IX Item "profile"
 Sets the encoding profile, possible values:
@@ -2250,10 +2257,6 @@ MPEG4 specifications.
 .IX Item "aac_ltp"
 Long term prediction profile, is enabled by and will enable the \fBaac_ltp\fR
 option. Introduced in MPEG4.
-.IP \fBaac_main\fR 4
-.IX Item "aac_main"
-Main-type prediction profile, is enabled by and will enable the \fBaac_pred\fR
-option. Introduced in MPEG2.
 .RE
 .RS 4
 .Sp
@@ -3348,7 +3351,7 @@ forces a wideband cutoff for bitrates < 15 kbps, unless CELT-only
 Set channel mapping family to be used by the encoder. The default value of \-1
 uses mapping family 0 for mono and stereo inputs, and mapping family 1
 otherwise. The default also disables the surround masking and LFE bandwidth
-optimzations in libopus, and requires that the input contains 8 channels or
+optimizations in libopus, and requires that the input contains 8 channels or
 fewer.
 .Sp
 Other values include 0 for mono and stereo, 1 for surround sound with masking
@@ -3710,6 +3713,56 @@ Vintage compatible is 1..3.
 .IX Item "strip_number_adaptivity integer"
 How much number of strips is allowed to change between frames.
 Higher is better but slower.
+.SS ffv1
+.IX Subsection "ffv1"
+FFv1 Encoder
+.PP
+\fIOptions\fR
+.IX Subsection "Options"
+.PP
+The following options are supported by FFmpeg's FFv1 encoder.
+.IP \fBcontext\fR 4
+.IX Item "context"
+Sets the context size, 0 (default) is small, 1 is big.
+.IP \fBcoder\fR 4
+.IX Item "coder"
+Set the coder,
+.RS 4
+.IP \fBrice\fR 4
+.IX Item "rice"
+Golomb rice coder
+.IP \fBrange_def\fR 4
+.IX Item "range_def"
+Range coder with default table
+.IP \fBrange_tab\fR 4
+.IX Item "range_tab"
+Range coder with custom table
+.RE
+.RS 4
+.RE
+.IP \fBslicecrc\fR 4
+.IX Item "slicecrc"
+\&\-1 (default, automatic), 1 use crc with zero initial and final state, 2 use crc with non zero initial and final state
+.IP \fBqtable\fR 4
+.IX Item "qtable"
+.RS 4
+.PD 0
+.IP \fBdefault\fR 4
+.IX Item "default"
+.PD
+default, automatic
+.IP \fB8bit\fR 4
+.IX Item "8bit"
+use 8bit default
+.IP \fBgreater8bit\fR 4
+.IX Item "greater8bit"
+use >8bit default
+.RE
+.RS 4
+.RE
+.IP \fBremap_optimizer\fR 4
+.IX Item "remap_optimizer"
+0 \- 5, default 3, how much effort the encoder puts into optimizing the remap table.
 .SS GIF
 .IX Subsection "GIF"
 GIF image/animation encoder.
@@ -4196,6 +4249,40 @@ For example to specify libaom encoding options with \fB\-aom\-params\fR:
 .Vb 1
 \&        ffmpeg \-i input \-c:v libaom\-av1 \-b:v 500K \-aom\-params tune=psnr:enable\-tpl\-model=1 output.mp4
 .Ve
+.SS liboapv
+.IX Subsection "liboapv"
+Advanced Professional Video codec encoder wrapper.
+.PP
+This encoder requires the presence of the liboapv headers and library
+during configuration. You need to explicitly configure the build with
+\&\fB\-\-enable\-liboapv\fR.
+.Sp
+.RS 4
+Many liboapv encoder options are mapped to FFmpeg global codec options,
+while unique encoder options are provided through private options.
+.RE
+.PP
+The apv project website is at <\fBhttps://github.com/AcademySoftwareFoundation/openapv\fR>.
+.PP
+\fIOptions\fR
+.IX Subsection "Options"
+.PP
+The following options are supported by the liboapv wrapper.
+.Sp
+.RS 4
+To get a more extensive documentation of the liboapv options, consult the
+liboapv documentation.
+.RE
+.IP \fBpreset\fR 4
+.IX Item "preset"
+Set the quality-speed tradeoff [fastest, fast, medium, slow, placebo, default]
+.IP \fBqp\fR 4
+.IX Item "qp"
+Set the quantization parameter value for CQP rate control mode.
+.IP "\fBoapv-params (\fR\fIparse_apv_params\fR\fB)\fR" 4
+.IX Item "oapv-params (parse_apv_params)"
+Set liboapvenc options using a list of \fIkey\fR=\fIvalue\fR pairs separated
+by ":". See the liboapv encoder user guide for a list of accepted parameters.
 .SS libsvtav1
 .IX Subsection "libsvtav1"
 SVT\-AV1 encoder wrapper.
@@ -4283,6 +4370,67 @@ Set log2 of the number of columns of tiles to use (0\-4).
 .IX Item "svtav1-params"
 Set SVT\-AV1 options using a list of \fIkey\fR=\fIvalue\fR pairs separated
 by ":". See the SVT\-AV1 encoder user guide for a list of accepted parameters.
+.SS libsvtjpegxs
+.IX Subsection "libsvtjpegxs"
+SVT-JPEG-XS encoder wrapper.
+.PP
+Requires the presence of the SVT-JPEG-XS headers and library during configuration.
+You need to explicitly configure the build with \f(CW\*(C`\-\-enable\-libsvtjpegxs\*(C'\fR.
+.PP
+\fIOptions\fR
+.IX Subsection "Options"
+.IP \fBdecomp_v\fR 4
+.IX Item "decomp_v"
+Set vertical decomposition level
+.IP \fBdecomp_h\fR 4
+.IX Item "decomp_h"
+Set horizontal decomposition level
+.IP \fBquantization\fR 4
+.IX Item "quantization"
+Set the quantization algorithm.
+.RS 4
+.IP \fBdeadzone\fR 4
+.IX Item "deadzone"
+.PD 0
+.IP \fBuniform\fR 4
+.IX Item "uniform"
+.RE
+.RS 4
+.RE
+.IP \fBcoding-signs\fR 4
+.IX Item "coding-signs"
+.PD
+Enable Signs handling strategy
+.RS 4
+.IP \fBdisable\fR 4
+.IX Item "disable"
+.PD 0
+.IP \fBfast\fR 4
+.IX Item "fast"
+.IP \fBfull\fR 4
+.IX Item "full"
+.RE
+.RS 4
+.RE
+.IP \fBcoding-sigf\fR 4
+.IX Item "coding-sigf"
+.PD
+Enable Significance coding
+.IP \fBcoding-vpred\fR 4
+.IX Item "coding-vpred"
+Enable Vertical Prediction coding
+.RS 4
+.IP \fBdisable\fR 4
+.IX Item "disable"
+.PD 0
+.IP \fBno_residuals\fR 4
+.IX Item "no_residuals"
+.IP \fBno_coeffs\fR 4
+.IX Item "no_coeffs"
+.RE
+.RS 4
+.RE
+.PD
 .SS libjxl
 .IX Subsection "libjxl"
 libjxl JPEG XL encoder wrapper.
@@ -5456,6 +5604,10 @@ Quantizer curve compression factor
 .PD
 Normally, when forcing a I\-frame type, the encoder can select any type
 of I\-frame. This option forces it to choose an IDR-frame.
+.IP \fBx265\-stats\fR 4
+.IX Item "x265-stats"
+Specify the file name for 2\-pass stats. This is set automatically when using
+the \fB\-passlogfile\fR option.
 .IP "\fBudu_sei\fR \fIboolean\fR" 4
 .IX Item "udu_sei boolean"
 Import user data unregistered SEI if available into output. Default is 0 (off).
@@ -5755,13 +5907,194 @@ rounded to 3 digits after the dot (e.g. 0.932).
 Set SSIM accuracy. Valid options are integers within the range of
 0\-4, while 0 gives the most accurate result and 4 computes the
 fastest.
+.SS MediaCodec
+.IX Subsection "MediaCodec"
+MediaCodec encoder wrapper enables hardware-accelerated video encoding on
+Android device. It supports H.264, H.265 (HEVC), VP8, VP9, MPEG\-4, and AV1
+encoding (whether works or not is device dependent).
+.PP
+Android provides two sets of APIs: Java MediaCodec and NDK MediaCodec. The
+MediaCodec encoder wrapper supports both. Note that the NDK MediaCodec API
+operates without requiring JVM, but may fail to function outside the JVM
+environment due to dependencies on system framework services, particularly
+after Android 15.
+.IP "\fBndk_codec\fR \fIboolean\fR" 4
+.IX Item "ndk_codec boolean"
+Use the NDK-based MediaCodec API instead of the Java API. Enabled by default
+if \f(CWav_jni_get_java_vm()\fR return NULL.
+.IP "\fBndk_async\fR \fIboolean\fR" 4
+.IX Item "ndk_async boolean"
+Use NDK MediaCodec in async mode. Async mode has less overhead than poll in a
+loop in sync mode. The drawback of async mode is AV_CODEC_FLAG_GLOBAL_HEADER
+doesn't work (use extract_extradata bsf when necessary). It doesn't work and
+will be disabled automatically on devices below Android 8.0.
+.IP "\fBcodec_name\fR \fIstring\fR" 4
+.IX Item "codec_name string"
+A codec type can have multiple implementations on a single device, this option
+specify which backend to use (via MediaCodec createCodecByName API). It's NULL
+by default, and encoder is created by createEncoderByType.
+.IP "\fBbitrate_mode\fR \fIinteger\fR" 4
+.IX Item "bitrate_mode integer"
+Possible values:
+.RS 4
+.IP \fBcq\fR 4
+.IX Item "cq"
+Constant quality mode
+.IP \fBvbr\fR 4
+.IX Item "vbr"
+Variable bitrate mode
+.IP \fBcbr\fR 4
+.IX Item "cbr"
+Constant bitrate mode
+.IP \fBcbr_fd\fR 4
+.IX Item "cbr_fd"
+Constant bitrate mode with frame drops
+.RE
+.RS 4
+.RE
+.IP "\fBpts_as_dts\fR \fIboolean\fR" 4
+.IX Item "pts_as_dts boolean"
+Use PTS as DTS. This is a workaround since MediaCodec API doesn't provide
+decoding timestamp. It is enabled automatically if B frame is 0.
+.IP "\fBoperating_rate\fR \fIinteger\fR" 4
+.IX Item "operating_rate integer"
+The desired operating rate that the codec will need to operate at, zero for
+unspecified. This is used for cases like high\-speed/slow\-motion video capture,
+where the video encoder format contains the target playback rate (e.g. 30fps),
+but the component must be able to handle the high operating capture rate (e.g.
+240fps). This rate will be used by codec for resource planning and setting the
+operating points.
+.IP "\fBqp_i_min\fR \fIinteger\fR" 4
+.IX Item "qp_i_min integer"
+Minimum quantization parameter for I frame.
+.IP "\fBqp_p_min\fR \fIinteger\fR" 4
+.IX Item "qp_p_min integer"
+Minimum quantization parameter for P frame.
+.IP "\fBqp_b_min\fR \fIinteger\fR" 4
+.IX Item "qp_b_min integer"
+Minimum quantization parameter for B frame.
+.IP "\fBqp_i_max\fR \fIinteger\fR" 4
+.IX Item "qp_i_max integer"
+Maximum quantization parameter for I frame.
+.IP "\fBqp_p_max\fR \fIinteger\fR" 4
+.IX Item "qp_p_max integer"
+Maximum quantization parameter for P frame.
+.IP "\fBqp_b_max\fR \fIinteger\fR" 4
+.IX Item "qp_b_max integer"
+Maximum quantization parameter for B frame.
 .SS MediaFoundation
 .IX Subsection "MediaFoundation"
-This provides wrappers to encoders (both audio and video) in the
-MediaFoundation framework. It can access both SW and HW encoders.
+The following wrappers for encoders in the MediaFoundation framework are
+available:
+.IP *<h264_mf> 4
+.IX Item "*<h264_mf>"
+.PD 0
+.IP *<hevc_mf> 4
+.IX Item "*<hevc_mf>"
+.IP *<av1_mf> 4
+.IX Item "*<av1_mf>"
+.PD
+.PP
+These support both software and hardware encoding.
+.PP
 Video encoders can take input in either of nv12 or yuv420p form
 (some encoders support both, some support only either \- in practice,
 nv12 is the safer choice, especially among HW encoders).
+.PP
+Hardware-accelerated encoding requires D3D11, including hardware
+scaling capabilities through the scale_d3d11 filter.
+.PP
+To list all available options for the MediaFoundation encoders, use:
+\&\fBffmpeg \-h encoder=<encoder>\fR e.g. \fBffmpeg \-h encoder=h264_mf\fR
+.PP
+\fIOptions\fR
+.IX Subsection "Options"
+.IP \fBrate_control\fR 4
+.IX Item "rate_control"
+Select rate control mode. Available modes:
+.RS 4
+.IP \fBdefault\fR 4
+.IX Item "default"
+Default mode
+.IP \fBcbr\fR 4
+.IX Item "cbr"
+CBR mode
+.IP \fBpc_vbr\fR 4
+.IX Item "pc_vbr"
+Peak constrained VBR mode
+.IP \fBu_vbr\fR 4
+.IX Item "u_vbr"
+Unconstrained VBR mode
+.IP \fBquality\fR 4
+.IX Item "quality"
+Quality mode
+.IP \fBld_vbr\fR 4
+.IX Item "ld_vbr"
+Low delay VBR mode (requires Windows 8+)
+.IP \fBg_vbr\fR 4
+.IX Item "g_vbr"
+Global VBR mode (requires Windows 8+)
+.IP \fBgld_vbr\fR 4
+.IX Item "gld_vbr"
+Global low delay VBR mode (requires Windows 8+)
+.RE
+.RS 4
+.RE
+.IP \fBscenario\fR 4
+.IX Item "scenario"
+Select usage scenario. Available scenarios:
+.RS 4
+.IP \fBdefault\fR 4
+.IX Item "default"
+Default scenario
+.IP \fBdisplay_remoting\fR 4
+.IX Item "display_remoting"
+Display remoting scenario
+.IP \fBvideo_conference\fR 4
+.IX Item "video_conference"
+Video conference scenario
+.IP \fBarchive\fR 4
+.IX Item "archive"
+Archive scenario
+.IP \fBlive_streaming\fR 4
+.IX Item "live_streaming"
+Live streaming scenario
+.IP \fBcamera_record\fR 4
+.IX Item "camera_record"
+Camera record scenario
+.IP \fBdisplay_remoting_with_feature_map\fR 4
+.IX Item "display_remoting_with_feature_map"
+Display remoting with feature map scenario
+.RE
+.RS 4
+.RE
+.IP \fBquality\fR 4
+.IX Item "quality"
+Set encoding quality (0\-100). \-1 means default quality.
+.IP \fBhw_encoding\fR 4
+.IX Item "hw_encoding"
+Force hardware encoding (0\-1). Default is 0 (disabled).
+.PP
+\fIExamples\fR
+.IX Subsection "Examples"
+.PP
+Hardware encoding:
+.PP
+.Vb 1
+\&        ffmpeg \-i input.mp4 \-c:v h264_mf \-hw_encoding 1 output.mp4
+.Ve
+.PP
+Hardware-accelerated decoding with hardware encoding:
+.PP
+.Vb 1
+\&        ffmpeg \-hwaccel d3d11va \-i input.mp4 \-c:v h264_mf \-hw_encoding 1 output.mp4
+.Ve
+.PP
+Hardware-accelerated decoding, HW scaling and encoding with quality setting:
+.PP
+.Vb 1
+\&        ffmpeg \-hwaccel d3d11va \-hwaccel_output_format d3d11 \-i input.mp4 \-vf scale_d3d11=1920:1080 \-c:v hevc_mf \-hw_encoding 1 \-quality 80 output.mp4
+.Ve
 .SS "Microsoft RLE"
 .IX Subsection "Microsoft RLE"
 Microsoft RLE aka MSRLE encoder.
@@ -5866,6 +6199,12 @@ Default is 1 (on).
 .IX Subsection "png"
 PNG image encoder.
 .PP
+\fIOptions\fR
+.IX Subsection "Options"
+.IP \fBcompression_level\fR 4
+.IX Item "compression_level"
+Sets the compression level, from 0 to 9(default)
+.PP
 \fIPrivate options\fR
 .IX Subsection "Private options"
 .IP "\fBdpi\fR \fIinteger\fR" 4
@@ -5874,6 +6213,9 @@ Set physical density of pixels, in dots per inch, unset by default
 .IP "\fBdpm\fR \fIinteger\fR" 4
 .IX Item "dpm integer"
 Set physical density of pixels, in dots per meter, unset by default
+.IP "\fBpred\fR \fImethod\fR" 4
+.IX Item "pred method"
+Set prediction method (none, sub, up, avg, paeth, mixed), default is paeth
 .SS ProRes
 .IX Subsection "ProRes"
 Apple ProRes encoder.
@@ -6084,7 +6426,7 @@ For encoders set this flag to ON to reduce power consumption and GPU usage.
 \fIRuntime Options\fR
 .IX Subsection "Runtime Options"
 .PP
-Following options can be used durning qsv encoding.
+Following options can be used during qsv encoding.
 .IP \fIglobal_quality\fR 4
 .IX Item "global_quality"
 .PD 0
@@ -6219,7 +6561,7 @@ improves subjective visual quality. Enabling this flag may have negative impact
 on performance and objective visual quality metric.
 .IP \fIlow_delay_brc\fR 4
 .IX Item "low_delay_brc"
-Setting this flag turns on or off LowDelayBRC feautre in qsv plugin, which provides
+Setting this flag turns on or off LowDelayBRC feature in qsv plugin, which provides
 more accurate bitrate control to minimize the variance of bitstream size frame
 by frame. Value: \-1\-default 0\-off 1\-on
 .IP \fIadaptive_i\fR 4
@@ -6459,7 +6801,7 @@ improves subjective visual quality. Enabling this flag may have negative impact
 on performance and objective visual quality metric.
 .IP \fIlow_delay_brc\fR 4
 .IX Item "low_delay_brc"
-Setting this flag turns on or off LowDelayBRC feautre in qsv plugin, which provides
+Setting this flag turns on or off LowDelayBRC feature in qsv plugin, which provides
 more accurate bitrate control to minimize the variance of bitstream size frame
 by frame. Value: \-1\-default 0\-off 1\-on
 .IP \fIadaptive_i\fR 4
@@ -6761,7 +7103,7 @@ Extended bitrate control.
 Depth of look ahead in number frames, available when extbrc option is enabled.
 .IP \fIlow_delay_brc\fR 4
 .IX Item "low_delay_brc"
-Setting this flag turns on or off LowDelayBRC feautre in qsv plugin, which provides
+Setting this flag turns on or off LowDelayBRC feature in qsv plugin, which provides
 more accurate bitrate control to minimize the variance of bitstream size frame
 by frame. Value: \-1\-default 0\-off 1\-on
 .IP \fImax_frame_size\fR 4
@@ -7142,6 +7484,22 @@ Reduces detail but attempts to preserve color at extremely low bitrates.
 .RE
 .SH "SUBTITLES ENCODERS"
 .IX Header "SUBTITLES ENCODERS"
+.SS dvbsub
+.IX Subsection "dvbsub"
+This codec encodes the bitmap subtitle format that is used in DVB
+broadcasts and recordings. The bitmaps are typically embedded in a
+container such as MPEG-TS as a separate stream.
+.PP
+\fIOptions\fR
+.IX Subsection "Options"
+.IP "\fBmin_bpp\fR \fIinteger (2, 4, or 8)\fR" 4
+.IX Item "min_bpp integer (2, 4, or 8)"
+Set a minimum bits-per-pixel value for the subtitle color lookup tables.
+.Sp
+DVB supports 2, 4, and 8 bits-per-pixel color lookup tables.  This
+option enables forcing a particular bits-per-pixel value regardless of
+the number of colors.  Since not all players support or properly
+support 2 bits-per-pixel, this value defaults to 4.
 .SS dvdsub
 .IX Subsection "dvdsub"
 This codec encodes the bitmap subtitle format that is used in DVDs.
@@ -7167,6 +7525,18 @@ a fully transparent row if needed.  The overhead is low, typically
 one byte per subtitle on average.
 .Sp
 By default, this work-around is disabled.
+.SS lrc
+.IX Subsection "lrc"
+This codec encodes the LRC lyrics format.
+.PP
+\fIOptions\fR
+.IX Subsection "Options"
+.IP \fBprecision\fR 4
+.IX Item "precision"
+Specify the precision of the fractional part of the timestamp. Time base is
+determined based on this value.
+.Sp
+Defaults to 2 for centiseconds.
 .SH "SEE ALSO"
 .IX Header "SEE ALSO"
 \&\fBffmpeg\fR\|(1), \fBffplay\fR\|(1), \fBffprobe\fR\|(1), \fBlibavcodec\fR\|(3)

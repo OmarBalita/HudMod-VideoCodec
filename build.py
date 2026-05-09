@@ -1,12 +1,9 @@
-# Made By ChatGPT AI
+# Made by ChatGPT, Edited and reviewed by Malek
 
 import os
 import time
 import subprocess
 
-# =========================
-# ANSI COLORS
-# =========================
 RESET   = "\033[0m"
 BOLD    = "\033[1m"
 DIM     = "\033[2m"
@@ -19,26 +16,19 @@ MAGENTA = "\033[95m"
 CYAN    = "\033[96m"
 WHITE   = "\033[97m"
 
-# =========================
-# ASCII TITLE
-# =========================
 TITLE = f"""
-{RED}██╗  ██╗{YELLOW}██╗   ██╗{GREEN}██████╗ {CYAN}███╗   ███╗{MAGENTA} ██████╗ {MAGENTA}██████╗  
-{RED}██║  ██║{YELLOW}██║   ██║{GREEN}██╔══██╗{CYAN}████╗ ████║{MAGENTA}██╔═══██╗{MAGENTA}██╔══██╗ 
-{RED}███████║{YELLOW}██║   ██║{GREEN}██║  ██║{CYAN}██╔████╔██║{MAGENTA}██║   ██║{MAGENTA}██║  ██║ 
-{RED}██╔══██║{YELLOW}██║   ██║{GREEN}██║  ██║{CYAN}██║╚██╔╝██║{MAGENTA}██║   ██║{MAGENTA}██║  ██║ 
-{RED}██║  ██║{YELLOW}╚██████╔╝{GREEN}██████╔╝{CYAN}██║ ╚═╝ ██║{MAGENTA}╚██████╔╝{MAGENTA}██████╔╝ 
-{RED}╚═╝  ╚═╝ {YELLOW}╚═════╝ {GREEN}╚═════╝ {CYAN}╚═╝     ╚═╝{MAGENTA} ╚═════╝ {MAGENTA}╚═════╝  
+{WHITE}██╗  ██╗{WHITE}██╗   ██╗{WHITE}██████╗ {WHITE}███╗   ███╗{WHITE} ██████╗ {WHITE}██████╗  
+{WHITE}██║  ██║{WHITE}██║   ██║{WHITE}██╔══██╗{WHITE}████╗ ████║{WHITE}██╔═══██╗{WHITE}██╔══██╗ 
+{WHITE}███████║{WHITE}██║   ██║{WHITE}██║  ██║{WHITE}██╔████╔██║{WHITE}██║   ██║{WHITE}██║  ██║ 
+{WHITE}██╔══██║{WHITE}██║   ██║{WHITE}██║  ██║{WHITE}██║╚██╔╝██║{WHITE}██║   ██║{WHITE}██║  ██║ 
+{WHITE}██║  ██║{WHITE}╚██████╔╝{WHITE}██████╔╝{WHITE}██║ ╚═╝ ██║{WHITE}╚██████╔╝{WHITE}██████╔╝ 
+{WHITE}╚═╝  ╚═╝ {WHITE}╚═════╝ {WHITE}╚═════╝ {WHITE}╚═╝     ╚═╝{WHITE} ╚═════╝ {WHITE}╚═════╝  
 
-{DIM}               G D E x t e n s i o n{RESET}
+{DIM}               {MAGENTA}G D E x t e n s i o n{RESET}
 """
 
-# =========================
-# HELPERS
-# =========================
 def clear():
     os.system("cls" if os.name == "nt" else "clear")
-
 
 def separator():
     print(f"{DIM}{'-' * 55}{RESET}")
@@ -83,9 +73,6 @@ def ask_choice(title, options):
         print(f"{RED}Invalid choice, try again.{RESET}")
 
 
-# =========================
-# MAIN
-# =========================
 def main():
     clear()
 
@@ -97,9 +84,6 @@ def main():
 
     separator()
 
-    # =========================
-    # PLATFORM
-    # =========================
     platform = ask_choice(
         "Choose Target Platform",
         [
@@ -110,22 +94,17 @@ def main():
 
     separator()
 
-    # =========================
-    # ARCHITECTURE
-    # =========================
     arch = ask_choice(
         "Choose Architecture",
         [
             "x86_64",
+            "x86_32",
             "arm64"
         ]
     )
 
     separator()
 
-    # =========================
-    # BUILD TYPE
-    # =========================
     build_type = ask_choice(
         "Choose Build Type",
         [
@@ -136,9 +115,6 @@ def main():
 
     separator()
 
-    # =========================
-    # MINGW
-    # =========================
     use_mingw = "no"
 
     if platform == "windows":
@@ -152,9 +128,6 @@ def main():
 
     separator()
 
-    # =========================
-    # BUILD COMMAND
-    # =========================
     command = ["scons"]
 
     command.append(f"platform={platform}")
@@ -166,9 +139,6 @@ def main():
     if platform == "windows":
         command.append(f"use_mingw={use_mingw}")
 
-    # =========================
-    # CONFIG SUMMARY
-    # =========================
     print(f"\n{BOLD}{MAGENTA}Build Configuration{RESET}\n")
 
     print(f"{CYAN}Platform:{RESET}      {WHITE}{platform}{RESET}")
@@ -191,9 +161,7 @@ def main():
         print(f"\n{RED}Build cancelled.{RESET}\n")
         return
 
-    # =========================
-    # RUN BUILD
-    # =========================
+
     print(f"\n{CYAN}Starting build process...{RESET}\n")
 
     try:

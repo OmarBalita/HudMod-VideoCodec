@@ -208,8 +208,8 @@ input files.
 .SS "Generic options"
 .IX Subsection "Generic options"
 These options are shared amongst the ff* tools.
-.IP \fB\-L\fR 4
-.IX Item "-L"
+.IP "\fB\-L, \-license\fR" 4
+.IX Item "-L, -license"
 Show license.
 .IP "\fB\-h, \-?, \-help, \-\-help [\fR\fIarg\fR\fB]\fR" 4
 .IX Item "-h, -?, -help, --help [arg]"
@@ -344,6 +344,12 @@ and the "Last message repeated n times" line will be omitted.
 Indicates that log output should add a \f(CW\*(C`[level]\*(C'\fR prefix to each message
 line. This can be used as an alternative to log coloring, e.g. when dumping the
 log to file.
+.IP \fBtime\fR 4
+.IX Item "time"
+Indicates that log lines should be prefixed with time information.
+.IP \fBdatetime\fR 4
+.IX Item "datetime"
+Indicates that log lines should be prefixed with date and time information.
 .RE
 .RS 4
 .Sp
@@ -694,7 +700,8 @@ To show only video packets belonging to the video stream with index 1:
 .Ve
 .IP \fB\-show_data\fR 4
 .IX Item "-show_data"
-Show payload data, as a hexadecimal and ASCII dump. Coupled with
+Show payload data, as a hexadecimal and ASCII dump (other formats can be
+selected using \fB\-data_dump_format\fR). Coupled with
 \&\fB\-show_packets\fR, it will dump the packets' data. Coupled with
 \&\fB\-show_streams\fR, it will dump the codec extradata.
 .Sp
@@ -703,6 +710,11 @@ The dump is printed as the "data" field. It may contain newlines.
 .IX Item "-show_data_hash algorithm"
 Show a hash of payload data, for packets with \fB\-show_packets\fR and for
 codec extradata with \fB\-show_streams\fR.
+.IP "\fB\-data_dump_format\fR \fIformat\fR" 4
+.IX Item "-data_dump_format format"
+Select a format used for the data dumps enabled with the \fB\-show_data\fR
+option. The default is \f(CW\*(C`xxd\*(C'\fR which is a hexdump format compatible with the
+well-known \fBxxd\fR program. \f(CW\*(C`base64\*(C'\fR is also supported.
 .IP \fB\-show_error\fR 4
 .IX Item "-show_error"
 Show information about the error found when trying to probe the input.
@@ -715,13 +727,6 @@ stream.
 .Sp
 All the container format information is printed within a section with
 name "FORMAT".
-.IP "\fB\-show_format_entry\fR \fIname\fR" 4
-.IX Item "-show_format_entry name"
-Like \fB\-show_format\fR, but only prints the specified entry of the
-container format information, rather than all. This option may be given more
-than once, then all specified entries will be shown.
-.Sp
-This option is deprecated, use \f(CW\*(C`show_entries\*(C'\fR instead.
 .IP "\fB\-show_entries\fR \fIsection_entries\fR" 4
 .IX Item "-show_entries section_entries"
 Set list of entries to show.
@@ -935,6 +940,20 @@ Some writers viz. JSON and XML, omit the printing of fields with invalid or non-
 while other writers always print them. This option enables one to control this behaviour.
 Valid values are \f(CW\*(C`always\*(C'\fR/\f(CW1\fR, \f(CW\*(C`never\*(C'\fR/\f(CW0\fR and \f(CW\*(C`auto\*(C'\fR/\f(CW\-1\fR.
 Default is \fIauto\fR.
+.IP \fB\-analyze_frames\fR 4
+.IX Item "-analyze_frames"
+Analyze frames and/or their side data up to the provided read interval,
+providing additional information that may be useful at a stream level.
+Must be paired with the \fB\-show_streams\fR option or it will have no effect.
+.Sp
+Currently, the additional fields provided by this option when enabled are the
+\&\f(CW\*(C`closed_captions\*(C'\fR and \f(CW\*(C`film_grain\*(C'\fR fields.
+.Sp
+For example, to analyze the first 20 seconds and populate these fields:
+.Sp
+.Vb 1
+\&        ffprobe \-show_streams \-analyze_frames \-read_intervals "%+20" INPUT
+.Ve
 .IP \fB\-bitexact\fR 4
 .IX Item "-bitexact"
 Force bitexact output, useful to produce output which is not dependent
@@ -946,6 +965,15 @@ Read \fIinput_url\fR.
 .IX Item "-o output_url"
 Write output to \fIoutput_url\fR. If not specified, the output is sent
 to stdout.
+.IP "\fB\-c:\fR\fImedia_specifier\fR\fB \fR\fIcodec_name\fR" 4
+.IX Item "-c:media_specifier codec_name"
+.PD 0
+.IP "\fB\-codec:\fR\fImedia_specifier\fR\fB \fR\fIcodec_name\fR" 4
+.IX Item "-codec:media_specifier codec_name"
+.PD
+Force a specific decoder implementation for the stream identified by
+\&\fImedia_specifier\fR, which can assume the values \f(CW\*(C`a\*(C'\fR (audio),
+\&\f(CW\*(C`v\*(C'\fR (video), \f(CW\*(C`s\*(C'\fR (subtitle), and \f(CW\*(C`d\*(C'\fR (data).
 .SH WRITERS
 .IX Header "WRITERS"
 A writer defines the output format adopted by \fBffprobe\fR, and will be

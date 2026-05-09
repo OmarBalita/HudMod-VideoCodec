@@ -178,8 +178,8 @@ input files.
 .SS "Generic options"
 .IX Subsection "Generic options"
 These options are shared amongst the ff* tools.
-.IP \fB\-L\fR 4
-.IX Item "-L"
+.IP "\fB\-L, \-license\fR" 4
+.IX Item "-L, -license"
 Show license.
 .IP "\fB\-h, \-?, \-help, \-\-help [\fR\fIarg\fR\fB]\fR" 4
 .IX Item "-h, -?, -help, --help [arg]"
@@ -314,6 +314,12 @@ and the "Last message repeated n times" line will be omitted.
 Indicates that log output should add a \f(CW\*(C`[level]\*(C'\fR prefix to each message
 line. This can be used as an alternative to log coloring, e.g. when dumping the
 log to file.
+.IP \fBtime\fR 4
+.IX Item "time"
+Indicates that log lines should be prefixed with time information.
+.IP \fBdatetime\fR 4
+.IX Item "datetime"
+Indicates that log lines should be prefixed with date and time information.
 .RE
 .RS 4
 .Sp
@@ -813,6 +819,14 @@ Vulkan configuration using a list of \fIkey\fR=\fIvalue\fR pairs separated by
 .IX Item "-hwaccel"
 Use HW accelerated decoding. Enable this option will enable vulkan renderer
 automatically.
+.IP "\fB\-video_bg\fR \fIpattern\fR" 4
+.IX Item "-video_bg pattern"
+Set the video background pattern used for transparent videos. For solid color
+patterns you can use the color name or color code as specified in the
+\&\fBColor section in the ffmpeg\-utils\|(1) manual\fR.
+You can also use the special \f(CW\*(C`tiles\*(C'\fR keyword for a checker board style
+pattern. This is also the default. The \f(CW\*(C`none\*(C'\fR pattern does rendering
+without alpha blending effectively ignoring alpha channel.
 .SS "While playing"
 .IX Subsection "While playing"
 .IP "\fBq, ESC\fR" 4
@@ -857,15 +871,13 @@ Pause if the stream is not already paused, step to the next video
 frame, and pause.
 .IP \fBleft/right\fR 4
 .IX Item "left/right"
-Seek backward/forward 10 seconds.
+Seek backward/forward by 10 seconds or a custom interval if \-seek_interval is set.
 .IP \fBdown/up\fR 4
 .IX Item "down/up"
 Seek backward/forward 1 minute.
 .IP "\fBpage down/page up\fR" 4
 .IX Item "page down/page up"
-Seek to the previous/next chapter.
-or if there are no chapters
-Seek backward/forward 10 minutes.
+Seek to previous/next chapter or backward/forward 10 minutes if no chapters.
 .IP "\fBright mouse click\fR" 4
 .IX Item "right mouse click"
 Seek to percentage in file corresponding to fraction of width.
