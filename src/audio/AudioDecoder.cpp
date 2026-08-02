@@ -1,5 +1,6 @@
 // Written by Claude AI.
-#include "audio/AudioDecoder.hpp"
+#include "audio/AudioDecoder.h"
+#include <vector>
 
 using namespace godot;
 

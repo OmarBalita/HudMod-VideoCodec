@@ -1,5 +1,4 @@
-// التعليقات المكتوبة في هذا الكود تمت كتابتها من قبل المطور: Omar TOP
-#include "audio/AudioRenderer.hpp"
+#include "audio/AudioRenderer.h"
 
 namespace godot {
 

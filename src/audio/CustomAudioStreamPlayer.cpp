@@ -1,5 +1,4 @@
-#include "audio/CustomAudioStreamPlayer.hpp"
-#include "AudioMixer.hpp"
+#include "audio/CustomAudioStreamPlayer.h"
 
 namespace godot {
 

@@ -1,4 +1,4 @@
-#include "audio/AudioMixer.hpp"
+#include "audio/AudioMixer.h"
 
 namespace godot {
 

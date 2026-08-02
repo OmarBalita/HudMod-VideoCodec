@@ -1,4 +1,5 @@
-#include "core/ColorScopeMath.hpp"
+#include "core/math/ColorScopeMath.h"
+#include <vector>
 
 namespace godot {
 
